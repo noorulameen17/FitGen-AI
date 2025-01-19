@@ -2,6 +2,12 @@ import Cerebras from "@cerebras/cerebras_cloud_sdk";
 import { NextResponse } from "next/server";
 import { supabase } from "../../lib/supabaseClient";
 
+// Function to get dietary preferences
+function getMealPreferences() {
+  // This is a placeholder for getting user input. In a real application, you might get this from a database or user input.
+  return "vegan, halal"; // Example preferences
+}
+
 export async function GET() {
   try {
     const { data: metrics, error: fetchError } = await supabase
@@ -27,6 +33,8 @@ export async function GET() {
     const latestMetrics = metrics[0];
     console.log("Latest metrics:", latestMetrics); // Debug log
 
+    const mealPreferences = getMealPreferences(); // Get dietary preferences
+
     const client = new Cerebras({
       apiKey: process.env.NEXT_PUBLIC_CEREBRAS_API_KEY,
     });
@@ -34,20 +42,38 @@ export async function GET() {
       messages: [
         {
           role: "user",
-          content: `Create a meal plan based on these metrics:
-      - Blood Sugar: ${latestMetrics.bloodSugar || "Not provided"} mg/dL
-      - Blood Pressure: ${latestMetrics.bloodPressure || "Not provided"} mmHg
-      - Weight: ${latestMetrics.weight || "Not provided"} kg
-      - Heart Beat: ${latestMetrics.heartBeat || "Not provided"} bpm
-      - Age: ${latestMetrics.Age || "Not provided"} years
+          content: `You're a virtual nutritionist specializing in personalized, data-driven meal plans. Generate a meal plan tailored to the user's health metrics and preferences.  
 
-      Format:
-      - Breakfast: (calories, protein, carbs, fats)
-      - Lunch: (calories, protein, carbs, fats)
-      - Dinner: (calories, protein, carbs, fats)
-      - Snacks: (calories, protein, carbs, fats)
+**Health Profile:**  
+- Blood Sugar: ${latestMetrics.bloodSugar || "Unknown"} mg/dL  
+- Blood Pressure: ${latestMetrics.bloodPressure || "Unknown"} mmHg  
+- Weight: ${latestMetrics.weight || "Unknown"} kg  
+- Heart Rate: ${latestMetrics.heartBeat || "Unknown"} bpm  
+- Age: ${latestMetrics.Age || "Unknown"} years  
 
-      Tailor recommendations to the provided metrics.`,
+**Dietary Preferences:** ${mealPreferences || "None"}  
+
+
+**Output Format:**  
+1. **Breakfast:**  
+   - **Dish Name:** Scrambled eggs  
+   - **Nutrition Breakdown:** Calories: X kcal, Protein: Y g, Carbs: Z g, Fats: W g.  
+   - **Health Benefit Highlight:** Briefly mention how this meal supports the user's health metrics.  
+2. **Lunch:**  
+   - **Dish Name:** Grilled chicken salad  
+   - **Nutrition Breakdown:** Calories: X kcal, Protein: Y g, Carbs: Z g, Fats: W g.  
+   - **Health Benefit Highlight:** Briefly mention how this meal supports the user's health metrics.  
+3. **Snacks:**  
+   - **Dish Name:** Mixed nuts  
+   - **Nutrition Breakdown:** Calories: X kcal, Protein: Y g, Carbs: Z g, Fats: W g.  
+   - **Health Benefit Highlight:** Briefly mention how this meal supports the user's health metrics.  
+4. **Dinner:**  
+   - **Dish Name:** Baked salmon with vegetables  
+   - **Nutrition Breakdown:** Calories: X kcal, Protein: Y g, Carbs: Z g, Fats: W g.  
+   - **Health Benefit Highlight:** Briefly mention how this meal supports the user's health metrics.  
+
+Ensure that the dish names are in **bold** and provide a colorful representation. Include food icons for each meal type (Breakfast, Lunch, Snacks, Dinner) in the response.  
+Create a plan that's practical, effective, and easy for the user to follow. Strictly adhere to the format for consistency.`,
         },
       ],
       model: "llama3.1-8b",

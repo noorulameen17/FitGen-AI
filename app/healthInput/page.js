@@ -15,6 +15,7 @@ export default function HealthInput() {
     heartBeat: "",
     patientId: "",
     date: "",
+    dietaryPreferences: "", // New field for dietary preferences
   });
 
   const [error, setError] = useState("");
@@ -81,6 +82,7 @@ export default function HealthInput() {
         heartBeat: "",
         patientId: "",
         date: "",
+        dietaryPreferences: "",
       });
     }
   };
@@ -254,6 +256,20 @@ export default function HealthInput() {
                     setHealthData({ ...healthData, weight: e.target.value })
                   }
                   required
+                />
+              </div>
+              <div>
+                <TextField
+                  label="Dietary Preferences"
+                  fullWidth
+                  value={healthData.dietaryPreferences}
+                  onChange={(e) =>
+                    setHealthData({
+                      ...healthData,
+                      dietaryPreferences: e.target.value,
+                    })
+                  }
+                  placeholder="e.g., vegan, halal"
                 />
               </div>
               <Button type="submit" className="w-full">

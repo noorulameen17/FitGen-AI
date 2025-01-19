@@ -3,13 +3,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ShimmerButton from "@/components/ui/shimmer-button";
 import { faUserPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Box, Button, CircularProgress } from "@mui/material";
+import { Box, CircularProgress } from "@mui/material";
 import { BarChart, Calendar, Droplet, Weight } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
+import { useUser } from "@clerk/nextjs";
 
 export default function Dashboard() {
+  const { user } = useUser(); 
   const [metrics, setMetrics] = useState([]);
   const [uniquePatients, setUniquePatients] = useState(0);
 
@@ -18,6 +20,7 @@ export default function Dashboard() {
       const { data, error } = await supabase
         .from("healthData")
         .select("bloodSugar, bloodPressure, weight, created_at, patientId")
+        .eq("patientId", user.id) // Filter by the current user's ID
         .order("created_at", { ascending: false });
       if (error) return console.error("Error fetching metrics:", error.message);
       setMetrics(data);
@@ -27,8 +30,10 @@ export default function Dashboard() {
       setUniquePatients(uniquePatientIds.size);
     };
 
-    fetchMetrics();
-  }, []);
+    if (user) {
+      fetchMetrics();
+    }
+  }, [user]);
 
   const calculateHealthScore = (bloodSugar, bloodPressure, weight) => {
     let score = 100;
@@ -58,23 +63,23 @@ export default function Dashboard() {
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const day = String(date.getDate()).padStart(2, "0");
-    const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-based
+    const month = String(date.getMonth() + 1).padStart(2, "0"); 
     const year = date.getFullYear();
     return `${day}-${month}-${year}`;
   };
 
-  const getCardShadowColor = (index) => {
-    const colors = [
-      "red",
-      "green",
-      "blue",
-      "purple",
-      "orange",
-      "teal",
-      "pink",
-      "yellow",
+  const getCardShadowClass = (index) => {
+    const shadowClasses = [
+      "hover:shadow-red-500/50",
+      "hover:shadow-green-500/50",
+      "hover:shadow-blue-500/50",
+      "hover:shadow-purple-500/50",
+      "hover:shadow-orange-500/50",
+      "hover:shadow-teal-500/50",
+      "hover:shadow-pink-500/50",
+      "hover:shadow-yellow-500/50",
     ];
-    return colors[index % colors.length];
+    return shadowClasses[index % shadowClasses.length];
   };
 
   const patients = metrics.map((m) => ({
@@ -99,9 +104,7 @@ export default function Dashboard() {
         {patients.map((patient, index) => (
           <Card
             key={patient.id}
-            className={`hover:shadow-lg transition-shadow duration-300 hover:shadow-${getCardShadowColor(
-              index
-            )}-500`}
+            className={`hover:shadow-lg transition-shadow duration-300 ${getCardShadowClass(index)}`}
           >
             <CardHeader>
               <CardTitle>{patient.name}</CardTitle>
@@ -156,7 +159,7 @@ export default function Dashboard() {
         ))}
       </div>
       <Link href="/healthInput" passHref>
-        <div className="flex justify-center mt-3 pb-5" >
+        <div className="flex justify-center mt-3 pb-5">
           <ShimmerButton>
             <FontAwesomeIcon
               icon={faUserPlus}
