@@ -275,20 +275,19 @@ export function TextAnimate({
     : { container: defaultContainerVariants, item: defaultItemVariants };
 
   let segments = [];
-  const text = typeof children === 'string' ? children : children.props.children;
   switch (by) {
     case "word":
-      segments = text.split(/(\s+)/);
+      segments = children.split(/(\s+)/);
       break;
     case "character":
-      segments = text.split("");
+      segments = children.split("");
       break;
     case "line":
-      segments = text.split("\n");
+      segments = children.split("\n");
       break;
     case "text":
     default:
-      segments = [text];
+      segments = [children];
       break;
   }
 

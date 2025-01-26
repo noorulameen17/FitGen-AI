@@ -65,7 +65,10 @@ module.exports = {
   			'spin-around': 'spin-around calc(var(--speed) * 2) infinite linear',
   			shine: 'shine var(--duration) infinite linear',
   			grid: 'grid 15s linear infinite',
-  			rainbow: 'rainbow var(--speed, 2s) infinite linear'
+  			rainbow: 'rainbow var(--speed, 2s) infinite linear',
+  			'background-position-spin': 'background-position-spin 3000ms infinite alternate',
+  			'border-beam': 'border-beam calc(var(--duration)*1s) infinite linear',
+  			gradient: 'gradient 8s linear infinite'
   		},
   		keyframes: {
   			'shimmer-slide': {
@@ -113,7 +116,111 @@ module.exports = {
   				'100%': {
   					'background-position': '200%'
   				}
+  			},
+  			'background-position-spin': {
+  				'0%': {
+  					backgroundPosition: 'top center'
+  				},
+  				'100%': {
+  					backgroundPosition: 'bottom center'
+  				}
+  			},
+  			'aurora-border': {
+  				'0%, 100%': {
+  					borderRadius: '37% 29% 27% 27% / 28% 25% 41% 37%'
+  				},
+  				'25%': {
+  					borderRadius: '47% 29% 39% 49% / 61% 19% 66% 26%'
+  				},
+  				'50%': {
+  					borderRadius: '57% 23% 47% 72% / 63% 17% 66% 33%'
+  				},
+  				'75%': {
+  					borderRadius: '28% 49% 29% 100% / 93% 20% 64% 25%'
+  				}
+  			},
+  			'aurora-1': {
+  				'0%, 100%': {
+  					top: '0',
+  					right: '0'
+  				},
+  				'50%': {
+  					top: '50%',
+  					right: '25%'
+  				},
+  				'75%': {
+  					top: '25%',
+  					right: '50%'
+  				}
+  			},
+  			'aurora-2': {
+  				'0%, 100%': {
+  					top: '0',
+  					left: '0'
+  				},
+  				'60%': {
+  					top: '75%',
+  					left: '25%'
+  				},
+  				'85%': {
+  					top: '50%',
+  					left: '50%'
+  				}
+  			},
+  			'aurora-3': {
+  				'0%, 100%': {
+  					bottom: '0',
+  					left: '0'
+  				},
+  				'40%': {
+  					bottom: '50%',
+  					left: '25%'
+  				},
+  				'65%': {
+  					bottom: '25%',
+  					left: '50%'
+  				}
+  			},
+  			'aurora-4': {
+  				'0%, 100%': {
+  					bottom: '0',
+  					right: '0'
+  				},
+  				'50%': {
+  					bottom: '25%',
+  					right: '40%'
+  				},
+  				'90%': {
+  					bottom: '50%',
+  					right: '25%'
+  				}
+  			},
+  			'border-beam': {
+  				'100%': {
+  					'offset-distance': '100%'
+  				}
+  			},
+  			gradient: {
+  				to: {
+  					backgroundPosition: 'var(--bg-size) 0'
+  				}
   			}
+  		},
+  		fontFamily: {  			
+  			AstroSpace: [
+  				'var(--font-AstroSpace)'
+  			],
+  			Geargrind: [
+  				'var(--font-Geargrind)'
+				],
+			Fortuner : [
+				'var(--font-Fortuner)'
+			],
+			TypeLight: [
+  				'var(--font-TypeLight)'
+  			]
+			
+			
   		}
   	}
   },

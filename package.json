@@ -11,6 +11,8 @@
   "dependencies": {
     "@cerebras/cerebras_cloud_sdk": "^1.15.0",
     "@clerk/nextjs": "^6.9.12",
+    "@coreui/coreui": "^5.2.0",
+    "@coreui/react": "^5.4.1",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
@@ -25,7 +27,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.469.0",
-    "motion": "^11.15.0",
+    "motion": "^11.18.2",
     "next": "15.1.3",
     "next-themes": "^0.4.4",
     "react": "^19.0.0",

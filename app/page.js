@@ -1,99 +1,174 @@
-'use client';
+"use client";
 
+import { AuroraText } from "@/components/ui/aurora-text";
 import {
-  Card,
+  CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
-  CardDescription,
-  CardContent,
 } from "@/components/ui/card";
-import { Box } from "@mui/material";
-import { Brain, Heart, Activity } from "lucide-react";
-import RetroGrid from "@/components/ui/retro-grid";
+import { FlipText } from "@/components/ui/flip-text";
+import { MorphingText } from "@/components/ui/morphing-text";
+import { NeonGradientCard } from "@/components/ui/neon-gradient-card";
 import { RainbowButton } from "@/components/ui/rainbow-button";
-import BlurIn from "@/components/ui/blur-in";
-import { TextAnimate } from "@/components/ui/text-animate";
+import RetroGrid from "@/components/ui/retro-grid";
+import { useAuth } from "@clerk/nextjs";
+import { Box } from "@mui/material";
+import { Activity, Brain, Heart } from "lucide-react";
 import { motion } from "motion/react";
-import { SignInButton, useAuth, UserButton } from "@clerk/nextjs";
+import { useTheme } from "next-themes";
+import localFont from "next/font/local";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+
+const customFont = localFont({
+  src: "../public/fonts/AstroSpace-0Wl3o.otf",
+  variable: "--font-AstroSpace",
+});
+const geargrindFont = localFont({
+  src: "../public/fonts/Geargrind-zrOZl.otf",
+  variable: "--font-Geargrind",
+});
+
+const Fortuner = localFont({
+  src: "../public/fonts/FortuneMounerRegular-JpB6B.otf",
+  variable: "--font-Fortuner",
+});
+
+const TypeLight = localFont({
+  src: "../public/fonts/TypeLightSans-JpB5o.otf",
+  variable: "--font-TypeLight",
+});
+
+const texts = ["Welcome", "To"];
 
 export default function Home() {
   const { isSignedIn } = useAuth();
+  const [mounted, setMounted] = useState(false);
+
+  const theme = useTheme();
+  const shadowColor = theme.resolvedTheme === "dark" ? "white" : "black";
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return <div className="min-h-screen"></div>;
+  }
 
   return (
-    <Box>
-      <Box sx={{ position: "absolute", top: "1rem", right: "1rem" }}>
-        <UserButton redirectUrl="/" />
-      </Box>
-      <div className="flex flex-col justify-center items-center ">
-        <RetroGrid />
-        <div className="text-center mb-7">
-          <motion.div whileHover={{ scale: 1.3 }} whileTap={{ scale: 1 }}>
-            <BlurIn
-              word="Welcome To FitGen"
-              className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4"
-            />
-          </motion.div>
-          <TextAnimate animation="blurInUp" by="character">
-            <p className="text-xl text-gray-600 mb-8">
-              Your AI-powered health companion
-            </p>
-          </TextAnimate>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-5 ">
-            <Card className="hover:shadow-lg hover:shadow-purple-500/50 transition-shadow  duration-300 p-6 shadow-md backdrop-blur-md">
-              <CardHeader>
-                <CardTitle className="flex items-center text-xl">
-                  <Brain className="h-8 w-8 mr-2 text-purple-500 dark:text-pink-500" />
-                  AI-Powered
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CardDescription className="text-lg">
-                  Leverage AI for personalized health insights
-                </CardDescription>
-              </CardContent>
-            </Card>
-            <Card className="hover:shadow-lg hover:shadow-red-500/50 transition-shadow duration-300 p-6 shadow-md backdrop-blur-md">
-              <CardHeader>
-                <CardTitle className="flex items-center text-xl">
-                  <Heart className="h-8 w-8 mr-2 text-red-500" /> Holistic
-                  Health
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CardDescription className="text-lg">
-                  Track and improve your overall well-being
-                </CardDescription>
-              </CardContent>
-            </Card>
-            <Card className="hover:shadow-lg hover:shadow-green-500/50 transition-shadow duration-300 p-6 shadow-md backdrop-blur-md">
-              <CardHeader>
-                <CardTitle className="flex items-center text-xl">
-                  <Activity className="h-8 w-8 mr-2 text-green-500" /> Real-time
-                  Monitoring
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CardDescription className="mr-9 mt-1 text-lg">
-                  Stay on top of your health metrics
-                </CardDescription>
-              </CardContent>
-            </Card>
-          </div>
-          {!isSignedIn && (
-            <motion.div whileHover={{ scale: 1.3 }} whileTap={{ scale: 1 }}>
-              <SignInButton mode="modal">
-                <RainbowButton className="mt-8">
-                  Sign In to Get Started
-                </RainbowButton>
-              </SignInButton>
-              <Link href="/sign-up" passHref>
-                <RainbowButton className="mt-4">
-                  Sign Up
-                </RainbowButton>
-              </Link>
+    <Box className="min-h-screen ">
+      <div
+        className={`${customFont.variable} font-Geargrind text-center pt-20`}
+      >
+        <MorphingText
+          texts={texts}
+          className={`${Fortuner.variable} -mb-3 font-Fortuner text-9sm md:text-9xl bg-gradient-to-r from-black via-black to-sky-200 bg-clip-text text-transparent`}
+        />
+
+        <div className="flex flex-col justify-center items-center mb-10">
+          <RetroGrid className={"-mt-60 "} />
+
+          <AuroraText
+            className={`${customFont.variable}  font-AstroSpace text-4xl font-bold leading-none tracking-tight md:text-9xl flex flex-col mb-1`}
+          >
+            FitGen
+          </AuroraText>
+
+          <FlipText
+            className={`${TypeLight.variable} font-TypeLight text-2xl tracking-[-0.20em] text-gray-600 md:text-1xl`}
+            word="Your AI-Powered Health Companion"
+          />
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-4">
+            <motion.div
+              whileHover={{
+                scale: 1.1,
+                transition: { duration: 0.2 },
+              }}
+            >
+              <NeonGradientCard
+                neonColors={{
+                  firstColor: "rgba(147, 51, 254, 0.4)",
+                  secondColor: "rgba(192, 142, 252, 0.4)",
+                }}
+                className="max-w-sm items-center justify-center bg-slate-50"
+              >
+                <CardHeader>
+                  <CardTitle className="flex items-center text-xl">
+                    <Brain className="h-8 w-8 mr-2 text-purple-500 dark:text-pink-500" />
+                    AI-Powered
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription className="text-lg">
+                    Leverage AI for personalized health insights
+                  </CardDescription>
+                </CardContent>
+              </NeonGradientCard>
             </motion.div>
-          )}
+
+            <motion.div
+              whileHover={{
+                scale: 1.1,
+                transition: { duration: 0.2 },
+              }}
+            >
+              <NeonGradientCard
+                neonColors={{
+                  firstColor: "rgba(239, 68, 68, 0.4)",
+                  secondColor: "rgba(248, 113, 113, 0.4)",
+                }}
+                className="max-w-sm items-center justify-center bg-white"
+              >
+                <CardHeader>
+                  <CardTitle className="flex items-center text-xl">
+                    <Heart className="h-8 w-8 mr-2 text-red-500" />
+                    Holistic Health
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription className="text-lg">
+                    Track and improve your overall well-being
+                  </CardDescription>
+                </CardContent>
+              </NeonGradientCard>
+            </motion.div>
+
+            <motion.div
+              whileHover={{
+                scale: 1.1,
+                transition: { duration: 0 },
+              }}
+            >
+              <NeonGradientCard
+                neonColors={{
+                  firstColor: "rgba(34, 197, 94, 0.4)",
+                  secondColor: "rgba(134, 239, 172, 0.4)",
+                }}
+                className="max-w-sm items-center justify-center bg-white"
+              >
+                <CardHeader>
+                  <CardTitle className="flex items-center text-xl">
+                    <Activity className="h-8 w-8 mr-2 text-green-500" />
+                    Real-time Monitoring
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription className="text-lg">
+                    Stay on top of your health metrics
+                  </CardDescription>
+                </CardContent>
+              </NeonGradientCard>
+            </motion.div>
+          </div>
+
+          <motion.div whileHover={{ scale: 1.3 }} whileTap={{ scale: 1 }}>
+            <Link href="/sign-up" passHref>
+              <RainbowButton className="mt-4">Get Started</RainbowButton>
+            </Link>
+          </motion.div>
         </div>
       </div>
     </Box>
