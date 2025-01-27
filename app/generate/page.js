@@ -4,12 +4,10 @@ import { Box, CircularProgress, Paper, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import ShimmerButton from "@/components/ui/shimmer-button";
 import Link from "next/link";
 import { MdFreeBreakfast, MdLunchDining, MdDinnerDining } from "react-icons/md";
-import { FaBowlFood, FaUtensils, FaCookieBite } from "react-icons/fa6";
+import { FaBowlFood, FaCookieBite } from "react-icons/fa6";
 import { useRouter } from 'next/navigation';
-import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 import { motion } from "framer-motion";
 import ShineBorder from "@/components/ui/shine-border";
 import { RainbowButton } from "@/components/ui/rainbow-button";
@@ -19,10 +17,10 @@ const ChatContainer = styled(Paper)(({ theme }) => ({
   margin: theme.spacing(2),
   maxWidth: "900px",
   width: "100%",
-  borderRadius: "24px", // Increased border radius
-  backgroundColor: "rgba(255, 255, 255, 0.9)", // Added transparency
-  backdropFilter: "blur(10px)", // Added blur effect
-  boxShadow: "0 8px 32px rgba(0,0,0,0.1)", // Enhanced shadow
+  borderRadius: "24px", 
+  backgroundColor: "rgba(255, 255, 255, 0.9)",
+  backdropFilter: "blur(10px)", 
+  boxShadow: "0 8px 32px rgba(0,0,0,0.1)",
   transition: "all 0.4s ease",
   "&:hover": {
     boxShadow: "0 12px 40px rgba(0,0,0,0.15)",
@@ -96,56 +94,65 @@ export default function MealPlan() {
   const renderContent = (text) => {
     if (!text) return null;
 
+    const mealIcons = {
+      Breakfast: <MdFreeBreakfast size={24} color="#ff6b6b" />,
+      Lunch: <MdLunchDining size={24} color="#4ecdc4" />,
+      Snacks: <FaCookieBite size={24} color="#ffd93d" />,
+      Dinner: <MdDinnerDining size={24} color="#6c5ce7" />
+    };
+
     return text.split("\n").map((line, index) => {
-      
-      if (line.startsWith("**") && 
-          (line.includes("Breakfast:") || line.includes("Lunch:") || 
-           line.includes("Dinner:") || line.includes("Snacks:"))) {
+      // Meal Headers
+      if (line.startsWith("<span") && Object.keys(mealIcons).some(meal => line.includes(meal))) {
+        const mealType = Object.keys(mealIcons).find(meal => line.includes(meal));
         return (
           <Typography
             key={index}
             variant="h5"
-            className="pointer-events-none z-10 whitespace-pre-wrap bg-gradient-to-br from-[#ff2975] from-35% to-[#00FFF1] bg-clip-text text-center font-bold leading-none tracking-tighter text-transparent dark:drop-shadow-[0_5px_5px_rgba(0,0,0,0.8)]"
             sx={{
               mt: 4,
               mb: 2,
-              fontSize: "2.5rem", // Equivalent to text-4xl
+              display: "flex",
+              alignItems: "center",
+              gap: 2,
+              fontSize: "2rem",
+              fontWeight: "bold",
+              color: mealType === "Breakfast" ? "#ff6b6b" :
+                     mealType === "Lunch" ? "#4ecdc4" :
+                     mealType === "Snacks" ? "#ffd93d" : "#6c5ce7"
             }}
           >
-            {line.replace(/\*\*/g, "")}
+            {mealIcons[mealType]}
+            {mealType}
           </Typography>
         );
       }
 
-      // Sub-headers and content
-      if (line.includes("Dish Name:") || 
-          line.includes("Nutrition Breakdown:") || 
-          line.includes("Health Benefit Highlight:")) {
-        const [header, ...content] = line.substring(1).trim().split(":");
+      // Meal Details
+      if (line.includes("Meal:") || line.includes("Calories:") || line.includes("Health Benefits:")) {
+        const [label, content] = line.split(":");
         return (
           <Typography
             key={index}
-            component="li"
             sx={{
               mb: 2,
-              ml: 3,
-              padding: "8px 16px",
+              pl: 4,
               borderLeft: "3px solid",
-              borderColor: 
-                header.includes("Dish Name") ? "success.main" :
-                header.includes("Nutrition") ? "info.main" : "warning.main",
-              backgroundColor: "rgba(0,0,0,0.02)",
-              borderRadius: "4px"
+              borderColor: label.includes("Meal") ? "#2196f3" :
+                          label.includes("Calories") ? "#4caf50" : "#ff9800",
+              py: 1,
+              backgroundColor: "rgba(255,255,255,0.8)",
+              borderRadius: "0 8px 8px 0",
+              boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
             }}
           >
-            <span style={{ 
-              fontWeight: 700,
-              color: header.includes("Dish Name") ? "#2e7d32" :
-                     header.includes("Nutrition") ? "#0288d1" : "#ed6c02"
+            <strong style={{
+              color: label.includes("Meal") ? "#2196f3" :
+                     label.includes("Calories") ? "#4caf50" : "#ff9800"
             }}>
-              {header}:
-            </span>
-            <span style={{ color: "#424242" }}>{content.join(":")}</span>
+              {label}:
+            </strong>
+            {content}
           </Typography>
         );
       }
@@ -178,12 +185,13 @@ export default function MealPlan() {
             alignItems: "center",
           }}
         >
-          <FaUtensils style={{ marginRight: "8px", color: "red" }} />
+       
           {line}
         </Typography>
       );
     });
   };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}

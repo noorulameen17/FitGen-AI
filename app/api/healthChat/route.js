@@ -16,22 +16,21 @@ export async function POST(req) {
     const client = new Cerebras({
       apiKey: process.env.NEXT_PUBLIC_CEREBRAS_API_KEY,
     });
-
-    const stream = await client.chat.completions.create({
-      messages: [
-        {
-          role: "system",
-          content: "You are a knowledgeable health assistant that provides accurate, evidence-based health information and advice. Always provide balanced, well-researched responses while noting that users should consult healthcare professionals for personalized medical advice."
-        },
-        {
-          role: "user",
-          content: query
-        }
-      ],
-      model: "llama3.1-8b",
-      stream: true,
-    });
-
+const stream = await client.chat.completions.create({
+  messages: [
+    {
+      role: "system",
+      content: "You are a health assistant that provides information in exactly 3 short bullet points. Format each point with a bold subtopic followed by a brief, single-line explanation. Keep responses concise and direct. Example format\n **Topic** Brief explanation\n **Topic** Brief explanation\n **Topic** Brief explanation"
+    },
+    {
+      role: "user", 
+      content: query
+    }
+  ],
+  model: "llama3.1-8b",
+  stream: true,
+});
+    
     let responseContent = "";
     for await (const chunk of stream) {
       responseContent += chunk.choices[0]?.delta?.content || "";

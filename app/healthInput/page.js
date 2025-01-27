@@ -5,31 +5,40 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { supabase } from "../lib/supabaseClient";
 import { useUser } from "@clerk/nextjs";
-
+import { motion } from "framer-motion";
+import { RainbowButton } from "@/components/ui/rainbow-button";
+import { PulsatingButton } from "@/components/ui/pulsating-button";
 
 const ReferenceCard = ({ title, ranges }) => (
-  <Card className="hover:shadow-lg hover:shadow-purple-500/50 transition-shadow duration-300 p-6 shadow-md backdrop-blur-md h-fit">
-    <CardHeader>
-      <CardTitle>{title}</CardTitle>
-    </CardHeader>
-    <CardContent>
-      {ranges.map((range, index) => (
-        <div key={index} className="mb-4 last:mb-0">
-          <p className="text-sm">
-            <span style={{ 
-              color: range.color, 
-              fontWeight: "bold", 
-              display: "block",
-              marginBottom: "4px" 
-            }}>
-              {range.label}
-            </span>
-            <span className="text-gray-600">{range.value}</span>
-          </p>
-        </div>
-      ))}
-    </CardContent>
-  </Card>
+  <motion.div
+    initial={{ opacity: 0, scale: 0 }}
+    animate={{ opacity: 1, scale: 1 }}
+    whileHover={{ scale: 1.05 }}
+    transition={{ duration: 0.3 }}
+  >
+    <Card className="hover:shadow-lg hover:shadow-purple-500/50 transition-shadow duration-300 p-6 shadow-md backdrop-blur-md h-fit">
+      <CardHeader>
+        <CardTitle>{title}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        {ranges.map((range, index) => (
+          <div key={index} className="mb-4 last:mb-0">
+            <p className="text-sm">
+              <span style={{ 
+                color: range.color, 
+                fontWeight: "bold", 
+                display: "block",
+                marginBottom: "4px" 
+              }}>
+                {range.label}
+              </span>
+              <span className="text-gray-600">{range.value}</span>
+            </p>
+          </div>
+        ))}
+      </CardContent>
+    </Card>
+  </motion.div>
 );
 
 export default function HealthInput() {
@@ -194,21 +203,27 @@ export default function HealthInput() {
   return (
     <div className="pt-16">
       <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">
-        Health Input Form
+        Health Tracker
       </h1>
-      
+
       <div className="grid grid-cols-4 gap-6 px-4 max-w-7xl mx-auto">
         {/* Left Cards */}
         <div className="space-y-6">
-          <ReferenceCard title="Blood Sugar (mg/dL)" ranges={referenceData.bloodSugar} />
-          <ReferenceCard title="Blood Pressure (mmHg)" ranges={referenceData.bloodPressure} />
+          <ReferenceCard
+            title="Blood Sugar (mg/dL)"
+            ranges={referenceData.bloodSugar}
+          />
+          <ReferenceCard
+            title="Blood Pressure (mmHg)"
+            ranges={referenceData.bloodPressure}
+          />
         </div>
 
         {/* Center Form */}
         <div className="col-span-2">
           <Card className="hover:shadow-lg hover:shadow-purple-500/50 transition-shadow duration-300 p-6 shadow-md backdrop-blur-md">
             <CardHeader>
-              <CardTitle>Enter Patient Health Data</CardTitle>
+              <CardTitle>Enter Your Health Stats</CardTitle>
             </CardHeader>
             <CardContent>
               {error && <Alert severity="error">{error}</Alert>}
@@ -255,7 +270,10 @@ export default function HealthInput() {
                     fullWidth
                     value={healthData.bloodSugar}
                     onChange={(e) =>
-                      setHealthData({ ...healthData, bloodSugar: e.target.value })
+                      setHealthData({
+                        ...healthData,
+                        bloodSugar: e.target.value,
+                      })
                     }
                     required
                     helperText={inputHelperText.bloodSugar}
@@ -282,7 +300,10 @@ export default function HealthInput() {
                     fullWidth
                     value={healthData.heartBeat}
                     onChange={(e) =>
-                      setHealthData({ ...healthData, heartBeat: e.target.value })
+                      setHealthData({
+                        ...healthData,
+                        heartBeat: e.target.value,
+                      })
                     }
                     required
                   />
@@ -313,25 +334,28 @@ export default function HealthInput() {
                     placeholder="e.g., vegan, halal"
                   />
                 </div>
-                <Button type="submit" className="w-full">
+                <RainbowButton type="submit" className="w-full">
                   Submit
-                </Button>
+                </RainbowButton>
               </form>
             </CardContent>
           </Card>
-          <Button
+          <PulsatingButton
+            className="mt-4 -mr-96 w-full"
             variant="contained"
             onClick={handleNavigateToMealPlan}
-            style={{ display: "block", margin: "20px auto" }}
+            pulseColor="#007bff"
           >
             Generate Meal Plan
-          </Button>
+          </PulsatingButton>
         </div>
 
-        {/* Right Cards */}
         <div className="space-y-6">
           <ReferenceCard title="Weight (BMI)" ranges={referenceData.weight} />
-          <ReferenceCard title="Heart Rate (bpm)" ranges={referenceData.heartRate} />
+          <ReferenceCard
+            title="Heart Rate (bpm)"
+            ranges={referenceData.heartRate}
+          />
         </div>
       </div>
     </div>

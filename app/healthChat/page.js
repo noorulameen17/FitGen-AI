@@ -6,7 +6,23 @@ import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
-import { BorderBeam } from "@/components/ui/border-beam";
+import { RainbowButton } from "@/components/ui/rainbow-button";
+import { FlickeringGrid } from "@/components/ui/flickering-grid";
+import dynamic from "next/dynamic";
+import { AuroraText } from "@/components/ui/aurora-text";
+import localFont from "next/font/local";
+
+const customFont = localFont({
+  src: "../../public/fonts/AstroSpace-0Wl3o.otf",
+  variable: "--font-AstroSpace",
+});
+
+const CardioLoad = dynamic(() => import("../../components/cardio"), {
+  ssr: false,
+  loading: () => (
+    <Box display="flex" justifyContent="center" alignItems="center"></Box>
+  ),
+});
 
 export default function HealthChat() {
   const [messages, setMessages] = useState([
@@ -65,127 +81,183 @@ export default function HealthChat() {
   }, [messages]);
 
   return (
-    <Box className="pt-16 px-4">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
+    <div>
+      <FlickeringGrid
+        className="absolute inset-0 z-0 size-full"
+        squareSize={4}
+        gridGap={6}
+        color="#6B7280"
+        maxOpacity={0.5}
+        flickerChance={0.1}
+        height={900}
+        width={1500}
+      />
+      <Box
+        width="100%"
+        height="120vh"
+        display="flex"
+        flexDirection="column"
+        justifyContent="space-between"
+        alignItems="center"
+        overflow="hidden"
+        position="relative"
       >
-        <Box
-          sx={{
-            maxWidth: "1000px",
-            margin: "0 auto",
-            height: "calc(100vh - 150px)",
-            display: "flex",
-            flexDirection: "column",
-            position: "relative", // Ensure the parent container is positioned relative
-          }}
+        <div className="text-center mt-14 " >        
+        <AuroraText
+          className={`${customFont.variable} font-AstroSpace text-4xl font-bold leading-none tracking-tight md:text-9xl flex flex-col   `}
         >
-          <BorderBeam
-            size={300}
-            duration={15}
-            anchor={90}
-            borderWidth={2}
-            colorFrom="#0ea5e9"
-            colorTo="#6366f1"
-            className="absolute inset-0"
-          />
-          <div className="relative z-10 w-full h-full bg-white dark:bg-black rounded-xl p-6">
+          FitGen
+        </AuroraText>
+        <Box
+          flexGrow={1}
+          display="flex"
+          paddingTop={"100px"}
+          alignItems="center"
+          overflow="hidden"
+          position="relative"
+          zIndex={1}
+          sx={{
+            boxShadow: "0px 2px 20px #00acc1",
+          }}
+          >
+          <Stack
+            marginTop={-12.5}
+            direction="column"
+            width="1000px"
+            height="500px"
+            border="2px solid black"
+            p={4}
+            spacing={1}
+          >
             <Stack
               direction="column"
               spacing={2}
-              sx={{
-                flexGrow: 1,
-                overflow: "auto",
-                borderRadius: 2,
-                p: 2,
-              }}
+              flexGrow={1}
+              overflow="auto"
+              maxHeight="100%"
             >
-              {messages.map((msg, index) => (
+              {messages.map((message, index) => (
                 <motion.div
                   key={index}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <Box
-                    display="flex"
-                    justifyContent={
-                      msg.role === "assistant" ? "flex-start" : "flex-end"
-                    }
-                  >
-                    <Box
-                      sx={{
-                        bgcolor:
-                          msg.role === "assistant"
-                            ? "rgba(14, 165, 233, 0.9)"
-                            : "rgba(99, 102, 241, 0.9)",
-                        color: "white",
-                        borderRadius: 3,
-                        p: 2,
-                        maxWidth: "70%",
-                        backdropFilter: "blur(10px)",
-                        boxShadow: "0 4px 15px rgba(0,0,0,0.1)",
-                      }}
-                    >
-                      <Typography>{msg.content}</Typography>
-                    </Box>
-                  </Box>
+
+<Box
+  display="flex"
+  justifyContent={message.role === "assistant" ? "flex-start" : "flex-end"}
+>
+  <Box
+    bgcolor={message.role === "assistant" ? "#00acc1" : "#26a69a"}
+    color="white"
+    fontFamily={"dynapuff"}
+    borderRadius={16}
+    p={3}
+    maxWidth="65%"
+    sx={{
+      '& strong': {
+        color: '#FFD700', 
+        fontSize: '1.1em',
+        display: 'block',
+        marginBottom: '4px',
+        textTransform: 'uppercase',
+        letterSpacing: '0.5px',
+        textShadow: '1px 1px 2px rgba(0,0,0,0.3)'
+      },
+      '& ul': {
+        listStyle: 'none',
+        padding: 0,
+        margin: 0
+      },
+      '& li': {
+        marginBottom: '12px',
+        paddingLeft: '20px',
+        position: 'relative',
+        '&:before': {
+          content: '"•"',
+          position: 'absolute',
+          left: 0,
+          color: '#FFD700'
+        }
+      }
+    }}
+    dangerouslySetInnerHTML={{
+      __html: message.content.replace(
+        /\*\*(.*?)\*\*/g,
+        '<strong>$1</strong>'
+      )
+    }}
+  />
+</Box>
                 </motion.div>
               ))}
               <div ref={messagesEndRef} />
             </Stack>
 
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                sendMessage();
-              }}
-            >
-              <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
-                <TextField
-                  fullWidth
-                  variant="outlined"
-                  placeholder="Ask your health-related question..."
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  onKeyPress={(e) =>
-                    e.key === "Enter" && !e.shiftKey && sendMessage()
-                  }
-                  disabled={loading}
-                  sx={{
-                    "& .MuiOutlinedInput-root": {
-                      bgcolor: "rgba(255,255,255,0.9)",
-                      backdropFilter: "blur(10px)",
-                    },
-                  }}
-                />
-                <IconButton
-                  onClick={sendMessage}
-                  disabled={loading}
-                  sx={{
-                    bgcolor: "rgba(14, 165, 233, 0.9)",
-                    color: "white",
-                    backdropFilter: "blur(10px)",
-                    "&:hover": {
-                      bgcolor: "rgba(14, 165, 233, 0.7)",
-                      transform: "scale(1.05)",
-                    },
-                    transition: "all 0.3s ease",
-                  }}
+            {loading && (
+              <Box
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+              ></Box>
+            )}
+
+            {error && (
+              <Typography variant="body2" color="error">
+                {error}
+              </Typography>
+            )}
+
+            <Stack direction="row" spacing={2}>
+              <TextField
+                label="Health Related Queries..."
+                fullWidth
+                multiline
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                sx={{
+                  backgroundColor: "rgba(255, 255, 255, 0.9)",
+                  boxShadow: "0px 2px 20px #00acc1",
+                  "& .MuiInputLabel-root": {
+                    textShadow: "0 2px 4px rgba(0, 0, 0, 0.4)",
+                    fontWeight: "bold",
+                  },
+                }}
+              />
+              <IconButton
+                onClick={sendMessage}
+                disabled={loading}
+                sx={{ color: "#00695c", "&:hover": { color: "#00897b" } }}
                 >
-                  <motion.div
-                    whileHover={{ rotate: 15 }}
-                    whileTap={{ scale: 0.9 }}
-                  >
-                    <FontAwesomeIcon icon={faPaperPlane} />
-                  </motion.div>
-                </IconButton>
-              </Stack>
-            </form>
-          </div>
+                {loading ? (
+                  <CardioLoad />
+                ) : (
+                  <FontAwesomeIcon icon={faPaperPlane} />
+                )}
+              </IconButton>
+            </Stack>
+          </Stack>
         </Box>
-      </motion.div>
-    </Box>
+                </div>
+        <footer>
+          <Box textAlign="center" padding={3} mt={1}>
+            <RainbowButton onClick={() => router.push("/healthInput")}>
+              Back to Health Tracker
+            </RainbowButton>
+
+            <Typography
+              variant="body2"
+              color="black"
+              align="center"
+              sx={{ padding: 3, textShadow: "0 2px 4px rgba(0, 0, 0, 0.5)" }}
+            >
+              &copy; 2025 FitGen. All rights reserved. <br />
+               FitGen AI might give some off responses.
+            </Typography>
+          </Box>
+        </footer>
+      </Box>
+    </div>
   );
 }

@@ -68,7 +68,9 @@ module.exports = {
   			rainbow: 'rainbow var(--speed, 2s) infinite linear',
   			'background-position-spin': 'background-position-spin 3000ms infinite alternate',
   			'border-beam': 'border-beam calc(var(--duration)*1s) infinite linear',
-  			gradient: 'gradient 8s linear infinite'
+  			gradient: 'gradient 8s linear infinite',
+  			pulse: 'pulse var(--duration) ease-out infinite',
+  			ripple: 'ripple var(--duration,2s) ease calc(var(--i, 0)*.2s) infinite'
   		},
   		keyframes: {
   			'shimmer-slide': {
@@ -204,23 +206,37 @@ module.exports = {
   				to: {
   					backgroundPosition: 'var(--bg-size) 0'
   				}
+  			},
+  			pulse: {
+  				'0%, 100%': {
+  					boxShadow: '0 0 0 0 var(--pulse-color)'
+  				},
+  				'50%': {
+  					boxShadow: '0 0 0 8px var(--pulse-color)'
+  				}
+  			},
+  			ripple: {
+  				'0%, 100%': {
+  					transform: 'translate(-50%, -50%) scale(1)'
+  				},
+  				'50%': {
+  					transform: 'translate(-50%, -50%) scale(0.9)'
+  				}
   			}
   		},
-  		fontFamily: {  			
+  		fontFamily: {
   			AstroSpace: [
   				'var(--font-AstroSpace)'
   			],
   			Geargrind: [
   				'var(--font-Geargrind)'
-				],
-			Fortuner : [
-				'var(--font-Fortuner)'
-			],
-			TypeLight: [
+  			],
+  			Fortuner: [
+  				'var(--font-Fortuner)'
+  			],
+  			TypeLight: [
   				'var(--font-TypeLight)'
   			]
-			
-			
   		}
   	}
   },

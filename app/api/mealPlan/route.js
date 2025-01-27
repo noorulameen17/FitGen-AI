@@ -70,43 +70,46 @@ export async function GET() {
     const client = new Cerebras({
       apiKey: process.env.NEXT_PUBLIC_CEREBRAS_API_KEY,
     });
-    const stream = await client.chat.completions
-      .create({
-        messages: [
-          {
-            role: "user",
-            content: `You're a virtual nutritionist specializing in personalized, data-driven meal plans. Generate a meal plan tailored to the user's health metrics and preferences.  
+    const stream = await client.chat.completions.create({
+      messages: [
+        {
+          role: "system",
+          content: "You are a precision nutrition AI that creates personalized meal plans. Format responses with clear structure and visual elements. Do not use asterisks in the response."
+        },
+        {
+          role: "user",
+          content: `Based on these health metrics, generate a targeted daily meal plan:
 
-**Health Profile:**  
-- Blood Sugar: ${latestMetrics.bloodSugar || "Unknown"} mg/dL  
+Health Data:
+- Blood Sugar: ${latestMetrics.bloodSugar || "Unknown"} mg/dL
 - Blood Pressure: ${latestMetrics.bloodPressure || "Unknown"} mmHg  
-- Weight: ${latestMetrics.weight || "Unknown"} kg  
-- Heart Rate: ${latestMetrics.heartBeat || "Unknown"} bpm  
-- Age: ${latestMetrics.Age || "Unknown"} years  
+- Weight: ${latestMetrics.weight || "Unknown"} kg
+- Heart Rate: ${latestMetrics.heartBeat || "Unknown"} bpm
+- Age: ${latestMetrics.Age || "Unknown"} years
 
-**Dietary Preferences:** ${mealPreferences || "None"}  
+Generate a concise meal plan with exactly 4 meals (Breakfast, Lunch, Snacks, Dinner).
+For each meal provide:
 
-**Output Format (with Styling):**  
-1. Use **bold** text for section titles like "Breakfast," "Lunch," etc.  
-2. Add color to section titles using HTML spans with style attributes.
-3. Use emojis to make the output visually appealing (e.g., 🥗 for Lunch).  
-4. Provide a clear **Nutrition Breakdown** and highlight the **Health Benefits** of each meal.
+<span style="color:#ff6b6b"> Breakfast</span>
+- Meal: [Single main dish name]
+- Calories: [Total calories only]
+- Health Benefits: [One specific benefit related to user's health metrics]
 
-**Example Output Format:**  
+<span style="color:#4ecdc4"> Lunch</span>
+[Same format as breakfast]
 
-<span style='color:orange; font-weight:bold;'>🍳 Breakfast:</span>  
-- **Dish Name:** Scrambled eggs  
-- **Nutrition Breakdown:** Calories: X kcal, Protein: Y g, Carbs: Z g, Fats: W g.  
-- **Health Benefit Highlight:** Briefly mention how this meal supports the user's health metrics.`,
-          },
-        ],
-        model: "llama3.1-8b",
-        stream: true,
-      })
-      .catch((err) => {
-        console.error("Cerebras API Error:", err);
-        throw new Error("Failed to generate meal plan");
-      });
+<span style="color:#ffd93d"> Snacks</span>
+[Same format as breakfast]
+
+<span style="color:#6c5ce7"> Dinner</span>
+[Same format as breakfast]
+
+Keep descriptions brief and focused on the user's health metrics. Ensure the format remains consistent and do not use asterisks in the response and most importantly do not change this format.`
+        }
+      ],
+      model: "llama3.1-8b",
+      stream: true
+    });
 
     let mealPlanContent = "";
     for await (const chunk of stream) {
