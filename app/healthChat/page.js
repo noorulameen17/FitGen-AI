@@ -1,5 +1,5 @@
 "use client";
-import { Box, IconButton, Stack, TextField, Typography } from "@mui/material";
+import { Box, IconButton, Stack, TextField, Typography, CircularProgress } from "@mui/material";
 import { motion } from "framer-motion";
 import { useRef, useEffect, useState } from "react";
 import { useAuth } from "@clerk/nextjs";
@@ -37,6 +37,7 @@ export default function HealthChat() {
   const messagesEndRef = useRef(null);
   const { isSignedIn } = useAuth();
   const router = useRouter();
+  const [buttonLoading, setButtonLoading] = useState(false); // Add button loading state
 
   useEffect(() => {
     if (!isSignedIn) {
@@ -79,6 +80,11 @@ export default function HealthChat() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  const handleButtonClick = (path) => {
+    setButtonLoading(true); // Set button loading state to true
+    router.push(path);
+  };
 
   return (
     <div>
@@ -242,10 +248,14 @@ export default function HealthChat() {
                 </div>
         <footer>
           <Box textAlign="center" padding={3} mt={1}>
-            <RainbowButton onClick={() => router.push("/healthInput")}>
+            <RainbowButton onClick={() => handleButtonClick("/healthInput")}>
               Back to Health Tracker
             </RainbowButton>
-
+            {buttonLoading && (
+              <div className="flex justify-center mt-4">
+                <CircularProgress />
+              </div>
+            )}
             <Typography
               variant="body2"
               color="black"

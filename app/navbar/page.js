@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Home, BarChart2, FileInput, MessageSquare, Menu } from 'lucide-react';
 import { UserButton } from '@clerk/nextjs';
 import { useState } from 'react';
+import { CircularProgress } from '@mui/material';
 
 const navItems = [
   { href: '/', icon: Home, label: 'Home' },
@@ -14,6 +15,12 @@ const navItems = [
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const handleNavClick = (href) => {
+    setLoading(true);
+    window.location.href = href;
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white shadow-md">
@@ -33,9 +40,9 @@ export default function Navbar() {
           <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-center">
             <div className="flex space-x-8">
               {navItems.map((item, index) => (
-                <Link
+                <button
                   key={item.href}
-                  href={item.href}
+                  onClick={() => handleNavClick(item.href)}
                   className={`inline-flex items-center px-3 py-2 rounded-md text-sm font-medium text-gray-500 hover:bg-opacity-10 transition-all duration-300 ${
                     index === 0 ? 'hover:bg-blue-500 hover:text-blue-500 hover:shadow-[0_0_20px_3px_rgba(59,130,246,0.3)]' :
                     index === 1 ? 'hover:bg-green-500 hover:text-green-500 hover:shadow-[0_0_20px_3px_rgba(34,197,94,0.3)]' :
@@ -54,7 +61,7 @@ export default function Navbar() {
                     'text-yellow-500'
                   }`} />
                   {item.label}
-                </Link>
+                </button>
               ))}
             </div>
           </div>
@@ -69,9 +76,9 @@ export default function Navbar() {
         <div className={`${isMenuOpen ? 'block' : 'hidden'} sm:hidden`}>
           <div className="pt-2 pb-3 space-y-1">
             {navItems.map((item, index) => (
-              <Link
+              <button
                 key={item.href}
-                href={item.href}
+                onClick={() => handleNavClick(item.href)}
                 className={`block px-3 py-2 rounded-md text-base font-medium text-gray-500 hover:bg-opacity-10 transition-all duration-300 ${
                   index === 0 ? 'hover:bg-blue-500 hover:text-blue-500 hover:shadow-[0_0_20px_3px_rgba(59,130,246,0.3)]' :
                   index === 1 ? 'hover:bg-green-500 hover:text-green-500 hover:shadow-[0_0_20px_3px_rgba(34,197,94,0.3)]' :
@@ -92,11 +99,16 @@ export default function Navbar() {
                   }`} />
                   {item.label}
                 </div>
-              </Link>
+              </button>
             ))}
           </div>
         </div>
       </div>
+      {loading && (
+        <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-75 z-50">
+          <CircularProgress />
+        </div>
+      )}
     </nav>
   );
 }

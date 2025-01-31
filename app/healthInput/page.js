@@ -1,13 +1,16 @@
 "use client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Alert, Button, TextField, CircularProgress } from "@mui/material";
-import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
-import { supabase } from "../lib/supabaseClient";
-import { useUser } from "@clerk/nextjs";
-import { motion } from "framer-motion";
-import { RainbowButton } from "@/components/ui/rainbow-button";
 import { PulsatingButton } from "@/components/ui/pulsating-button";
+import { RainbowButton } from "@/components/ui/rainbow-button";
+import { DotPattern } from "@/components/ui/dot-pattern";
+import { Ripple } from "@/components/ui/ripple";
+import { useUser } from "@clerk/nextjs";
+import { Alert, CircularProgress, TextField } from "@mui/material";
+import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { supabase } from "../lib/supabaseClient";
+import { cn } from "@/lib/utils";
 
 const ReferenceCard = ({ title, ranges }) => (
   <motion.div
@@ -24,12 +27,14 @@ const ReferenceCard = ({ title, ranges }) => (
         {ranges.map((range, index) => (
           <div key={index} className="mb-4 last:mb-0">
             <p className="text-sm">
-              <span style={{ 
-                color: range.color, 
-                fontWeight: "bold", 
-                display: "block",
-                marginBottom: "4px" 
-              }}>
+              <span
+                style={{
+                  color: range.color,
+                  fontWeight: "bold",
+                  display: "block",
+                  marginBottom: "4px",
+                }}
+              >
                 {range.label}
               </span>
               <span className="text-gray-600">{range.value}</span>
@@ -51,21 +56,22 @@ export default function HealthInput() {
     heartBeat: "",
     patientId: "",
     date: "",
-    dietaryPreferences: "", 
+    dietaryPreferences: "",
   });
 
   useEffect(() => {
     if (isLoaded && user?.id) {
-      setHealthData(prev => ({
+      setHealthData((prev) => ({
         ...prev,
         patientId: user.id,
-        date: new Date().toISOString().split('T')[0]
+        date: new Date().toISOString().split("T")[0],
       }));
     }
   }, [user, isLoaded]);
 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [loading, setLoading] = useState(false); // Add loading state
   const router = useRouter();
 
   const validateInputs = () => {
@@ -118,10 +124,12 @@ export default function HealthInput() {
     try {
       const { data, error: dbError } = await supabase
         .from("healthData")
-        .insert([{
-          ...healthData,
-          patientId: healthData.patientId
-        }]);
+        .insert([
+          {
+            ...healthData,
+            patientId: healthData.patientId,
+          },
+        ]);
 
       if (dbError) {
         setError("Error inserting data: " + dbError.message);
@@ -129,7 +137,7 @@ export default function HealthInput() {
       } else {
         setSuccess("Data successfully inserted!");
         setError("");
-        setHealthData(prev => ({
+        setHealthData((prev) => ({
           ...prev,
           bloodSugar: "",
           bloodPressure: "",
@@ -146,6 +154,7 @@ export default function HealthInput() {
   };
 
   const handleNavigateToMealPlan = () => {
+    setLoading(true); // Set loading state to true
     router.push("/generate");
   };
 
@@ -167,26 +176,30 @@ export default function HealthInput() {
 
   const referenceData = {
     bloodSugar: [
-      { label: "Normal", value: "Fasting 70–100, Post-meal <140", color: "green" },
+      {
+        label: "Normal",
+        value: "Fasting 70–100, Post-meal <140",
+        color: "green",
+      },
       { label: "Low", value: "<70", color: "orange" },
-      { label: "Extreme", value: "Fasting >180, Post-meal >200", color: "red" }
+      { label: "Extreme", value: "Fasting >180, Post-meal >200", color: "red" },
     ],
     bloodPressure: [
       { label: "Normal", value: "90/60 – 120/80", color: "green" },
       { label: "Low", value: "<90/60", color: "orange" },
-      { label: "Extreme", value: ">180/120", color: "red" }
+      { label: "Extreme", value: ">180/120", color: "red" },
     ],
     weight: [
       { label: "Normal", value: "BMI 18.5–24.9", color: "green" },
       { label: "Underweight", value: "BMI <18.5", color: "orange" },
       { label: "Overweight", value: "BMI 25–29.9", color: "blue" },
-      { label: "Obesity", value: "BMI ≥30", color: "red" }
+      { label: "Obesity", value: "BMI ≥30", color: "red" },
     ],
     heartRate: [
       { label: "Normal", value: "60–100 (resting)", color: "green" },
       { label: "Low", value: "<60 (if symptomatic)", color: "orange" },
-      { label: "Extreme", value: ">120 (at rest)", color: "red" }
-    ]
+      { label: "Extreme", value: ">120 (at rest)", color: "red" },
+    ],
   };
 
   const inputHelperText = {
@@ -194,20 +207,30 @@ export default function HealthInput() {
     age: "Patient's age in years",
     date: "Date of health check-up",
     bloodSugar: "Normal range: Fasting 70-100 mg/dL, Post-meal <140 mg/dL",
-    bloodPressure: "Format: Systolic/Diastolic (e.g., 120/80). Normal range: 90/60 - 120/80",
+    bloodPressure:
+      "Format: Systolic/Diastolic (e.g., 120/80). Normal range: 90/60 - 120/80",
     heartBeat: "Normal resting heart rate: 60-100 beats per minute",
     weight: "Enter weight in kilograms. BMI will be calculated automatically",
-    dietaryPreferences: "Optional: Enter any dietary restrictions or preferences"
+    dietaryPreferences:
+      "Optional: Enter any dietary restrictions or preferences",
   };
 
   return (
-    <div className="pt-16">
+    <div className="pt-16 relative">
+     
+      <Ripple className="absolute inset-0 flex items-center justify-center -z-10" />
       <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">
         Health Tracker
       </h1>
-
+      <div className="flex flex-col items-center justify-center">
+        <p className="text-gray-600 text-center max-w-lg">
+          Enter your health stats below to track your progress and generate a
+          personalized meal plan.
+        </p>
+      </div>
+     
+      
       <div className="grid grid-cols-4 gap-6 px-4 max-w-7xl mx-auto">
-        {/* Left Cards */}
         <div className="space-y-6">
           <ReferenceCard
             title="Blood Sugar (mg/dL)"
@@ -219,7 +242,6 @@ export default function HealthInput() {
           />
         </div>
 
-        {/* Center Form */}
         <div className="col-span-2">
           <Card className="hover:shadow-lg hover:shadow-purple-500/50 transition-shadow duration-300 p-6 shadow-md backdrop-blur-md">
             <CardHeader>
@@ -234,7 +256,7 @@ export default function HealthInput() {
                     label="Patient ID"
                     fullWidth
                     value={healthData.patientId}
-                    disabled // Make it readonly since we're using user.id
+                    disabled
                     helperText={inputHelperText.patientId}
                   />
                 </div>
@@ -341,13 +363,18 @@ export default function HealthInput() {
             </CardContent>
           </Card>
           <PulsatingButton
-            className="mt-4 -mr-96 w-full"
+            className="mt-7 w-full"
             variant="contained"
             onClick={handleNavigateToMealPlan}
             pulseColor="#007bff"
           >
             Generate Meal Plan
           </PulsatingButton>
+          {loading && (
+            <div className="flex justify-center mt-4">
+              <CircularProgress />
+            </div>
+          )}
         </div>
 
         <div className="space-y-6">

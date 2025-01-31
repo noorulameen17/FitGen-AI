@@ -9,8 +9,8 @@ import { MdFreeBreakfast, MdLunchDining, MdDinnerDining } from "react-icons/md";
 import { FaBowlFood, FaCookieBite } from "react-icons/fa6";
 import { useRouter } from 'next/navigation';
 import { motion } from "framer-motion";
-import ShineBorder from "@/components/ui/shine-border";
 import { RainbowButton } from "@/components/ui/rainbow-button";
+import { WarpBackground } from "@/components/ui/warp-background";
 
 const ChatContainer = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(4),
@@ -42,6 +42,7 @@ export default function MealPlan() {
   const [mealPlan, setMealPlan] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [buttonLoading, setButtonLoading] = useState(false); // Add button loading state
 
   useEffect(() => {
     const fetchMealPlan = async () => {
@@ -192,6 +193,11 @@ export default function MealPlan() {
     });
   };
 
+  const handleButtonClick = (path) => {
+    setButtonLoading(true); // Set button loading state to true
+    router.push(path);
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -279,17 +285,11 @@ export default function MealPlan() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
           >
-            <ShineBorder
-              borderRadius={20}
-              borderWidth={2}
-              duration={10}
-              color={["#0ea5e9", "#6366f1"]}
-              className="w-full max-w-[900px] bg-white dark:bg-black"
-            >
+            <WarpBackground>
               <div className="p-6">
                 <MealSection>{renderContent(mealPlan)}</MealSection>
               </div>
-            </ShineBorder>
+            </WarpBackground>
           </motion.div>
         ) : null}
 
@@ -310,22 +310,29 @@ export default function MealPlan() {
               },
             }}
           >
-            <Link href="/healthInput" passHref>
-              <RainbowButton>
-                <motion.span whileHover={{ scale: 1.05 }}>
-                  Back To Health Input
-                </motion.span>
-              </RainbowButton>
-            </Link>
+            <RainbowButton onClick={() => handleButtonClick("/healthInput")}>
+              <motion.span whileHover={{ scale: 1.05 }}>
+                Back To Health Input
+              </motion.span>
+            </RainbowButton>
 
-            <Link href="/healthChat" passHref>
-              <RainbowButton>
-                <motion.span whileHover={{ scale: 1.05 }}>
-                  Chat with FitGen AI
-                </motion.span>
-              </RainbowButton>
-            </Link>
+            <RainbowButton onClick={() => handleButtonClick("/healthChat")}>
+              <motion.span whileHover={{ scale: 1.05 }}>
+                Chat with FitGen AI
+              </motion.span>
+            </RainbowButton>
+            
+            <RainbowButton onClick={() => handleButtonClick("/dashboard")}>
+              <motion.span whileHover={{ scale: 1.05 }}>
+                Go to Dashboard
+              </motion.span>
+            </RainbowButton>
           </Box>
+          {buttonLoading && (
+            <div className="flex justify-center mt-4">
+              <CircularProgress />
+            </div>
+          )}
         </motion.div>
       </Box>
     </motion.div>

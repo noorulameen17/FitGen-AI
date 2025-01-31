@@ -9,14 +9,17 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import { useUser } from "@clerk/nextjs";
-
+import { AnimatedGridPattern } from "@/components/ui/animated-grid-pattern";
+import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
 
 export default function Dashboard() {
-  const { user, isLoaded } = useUser(); // Add isLoaded check
+  const { user, isLoaded } = useUser();
   const [metrics, setMetrics] = useState([]);
   const [uniquePatients, setUniquePatients] = useState(0);
   const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(true); // Add loading state
+  const [loading, setLoading] = useState(true); 
+  const [buttonLoading, setButtonLoading] = useState(false); 
 
   useEffect(() => {
     const fetchMetrics = async () => {
@@ -55,21 +58,19 @@ export default function Dashboard() {
     };
 
     fetchMetrics();
-  }, [user, isLoaded]); // Add isLoaded to dependencies
+  }, [user, isLoaded]); 
 
   const calculateHealthScore = (bloodSugar, bloodPressure, weight) => {
     let score = 100;
 
-    // Blood sugar logic
+
     if (bloodSugar > 140) score -= 20;
     else if (bloodSugar > 120) score -= 10;
 
-    // Blood pressure logic
     const [systolic, diastolic] = bloodPressure.split("/").map(Number);
     if (systolic > 140 || diastolic > 90) score -= 20;
     else if (systolic > 120 || diastolic > 80) score -= 10;
 
-    // Weight logic
     if (weight > 100) score -= 20;
     else if (weight > 80) score -= 10;
 
@@ -105,7 +106,7 @@ export default function Dashboard() {
   };
 
   const patients = metrics.map((m) => ({
-    id: m.id, // Use the actual database ID instead of patientId
+    id: m.id, 
     patientId: m.patientId,
     healthScore: calculateHealthScore(m.bloodSugar, m.bloodPressure, m.weight),
     bloodSugar: m.bloodSugar,
@@ -114,8 +115,23 @@ export default function Dashboard() {
     lastCheckup: formatDate(m.created_at),
   }));
 
+  const handleButtonClick = (path) => {
+    setButtonLoading(true);
+    router.push(path);
+  };
+
   return (
-    <div className="pt-16"> {/* Add padding-top to account for navbar */}
+    <div className="pt-16">
+      <AnimatedGridPattern
+        numSquares={30}
+        maxOpacity={0.4}
+        duration={3}
+        repeatDelay={1}
+        className={cn(
+          "[mask-image:radial-gradient(700px_circle_at_center,white,transparent)]",
+          "inset-x-0 inset-y-[-30%] h-[200%] skew-y-12"
+        )}
+      />
       <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">
         Patient Dashboard
       </h1>
@@ -125,16 +141,17 @@ export default function Dashboard() {
           <CircularProgress />
         </div>
       ) : error ? (
-        <div className="text-red-500 text-center mb-4">
-          {error}
-        </div>
+        <div className="text-red-500 text-center mb-4">{error}</div>
       ) : metrics.length === 0 ? (
         <div className="text-center mb-4">
           <p className="text-gray-600 mb-4">No health records found.</p>
           <Link href="/healthInput" passHref>
-            <ShimmerButton>
+            <ShimmerButton onClick={() => setButtonLoading(true)}>
               <FontAwesomeIcon icon={faUserPlus} className="mr-2" />
               Add Health Data
+              {buttonLoading && (
+                <CircularProgress size={20} className="ml-2" />
+              )}
             </ShimmerButton>
           </Link>
         </div>
@@ -144,71 +161,79 @@ export default function Dashboard() {
           style={{ marginLeft: "12px", marginRight: "10px" }}
         >
           {patients.map((patient, index) => (
-            <Card
-              key={`${patient.id}-${index}`} // Use combination of ID and index for guaranteed uniqueness
-              className={`hover:shadow-lg transition-shadow duration-300 ${getCardShadowClass(index)}`}
+            <motion.div
+              key={`${patient.id}-${index}`}
+              whileHover={{ scale: 1.05 }}
+              className={`hover:shadow-lg transition-shadow duration-300 ${getCardShadowClass(
+                index
+              )}`}
             >
-              <CardHeader>
-                <CardTitle>Patient {patient.patientId}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium">Health Score:</span>
-                    <Box position="relative" display="inline-flex">
-                      <CircularProgress
-                        variant="determinate"
-                        value={patient.healthScore}
-                        style={{ color: getProgressColor(patient.healthScore) }}
-                      />
-                      <Box
-                        top={0}
-                        left={0}
-                        bottom={0}
-                        right={0}
-                        position="absolute"
-                        display="flex"
-                        alignItems="center"
-                        justifyContent="center"
-                      >
-                        <span>{patient.healthScore}</span>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Patient {patient.patientId}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span className="font-medium">Health Score:</span>
+                      <Box position="relative" display="inline-flex">
+                        <CircularProgress
+                          variant="determinate"
+                          value={patient.healthScore}
+                          style={{ color: getProgressColor(patient.healthScore) }}
+                        />
+                        <Box
+                          top={0}
+                          left={0}
+                          bottom={0}
+                          right={0}
+                          position="absolute"
+                          display="flex"
+                          alignItems="center"
+                          justifyContent="center"
+                        >
+                          <span>{patient.healthScore}</span>
+                        </Box>
                       </Box>
-                    </Box>
+                    </div>
+                    <div className="flex items-center">
+                      <Droplet className="h-5 w-5 mr-2 text-red-500" />
+                      <span className="font-medium">Blood Sugar:</span>
+                      <span className="ml-2">{patient.bloodSugar} mg/dL</span>
+                    </div>
+                    <div className="flex items-center">
+                      <BarChart className="h-5 w-5 mr-2 text-green-500" />
+                      <span className="font-medium">Blood Pressure:</span>
+                      <span className="ml-2">{patient.bp} mmHg</span>
+                    </div>
+                    <div className="flex items-center">
+                      <Weight className="h-5 w-5 mr-2 text-blue-500" />
+                      <span className="font-medium">Weight:</span>
+                      <span className="ml-2">{patient.weight} kg</span>
+                    </div>
+                    <div className="flex items-center">
+                      <Calendar className="h-5 w-5 mr-2 text-purple-500" />
+                      <span className="font-medium">Last Check-up:</span>
+                      <span className="ml-2">{patient.lastCheckup}</span>
+                    </div>
                   </div>
-                  <div className="flex items-center">
-                    <Droplet className="h-5 w-5 mr-2 text-red-500" />
-                    <span className="font-medium">Blood Sugar:</span>
-                    <span className="ml-2">{patient.bloodSugar} mg/dL</span>
-                  </div>
-                  <div className="flex items-center">
-                    <BarChart className="h-5 w-5 mr-2 text-green-500" />
-                    <span className="font-medium">Blood Pressure:</span>
-                    <span className="ml-2">{patient.bp} mmHg</span>
-                  </div>
-                  <div className="flex items-center">
-                    <Weight className="h-5 w-5 mr-2 text-blue-500" />
-                    <span className="font-medium">Weight:</span>
-                    <span className="ml-2">{patient.weight} kg</span>
-                  </div>
-                  <div className="flex items-center">
-                    <Calendar className="h-5 w-5 mr-2 text-purple-500" />
-                    <span className="font-medium">Last Check-up:</span>
-                    <span className="ml-2">{patient.lastCheckup}</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </motion.div>
           ))}
         </div>
       )}
       <Link href="/healthInput" passHref>
         <div className="flex justify-center mt-3 pb-5">
-          <ShimmerButton>
+          <ShimmerButton onClick={() => setButtonLoading(true)}>
             <FontAwesomeIcon
               icon={faUserPlus}
               style={{ marginRight: "10px", marginBottom: "2px" }}
             />
-            New Patient
+            Enter Health Data
+            {buttonLoading && (
+              <CircularProgress size={20} className="ml-2" />
+            )}
           </ShimmerButton>
         </div>
       </Link>

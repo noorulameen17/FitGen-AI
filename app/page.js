@@ -13,13 +13,14 @@ import { NeonGradientCard } from "@/components/ui/neon-gradient-card";
 import { RainbowButton } from "@/components/ui/rainbow-button";
 import RetroGrid from "@/components/ui/retro-grid";
 import { useAuth } from "@clerk/nextjs";
-import { Box } from "@mui/material";
+import { Box, CircularProgress } from "@mui/material"; // Import CircularProgress
 import { Activity, Brain, Heart } from "lucide-react";
 import { motion } from "motion/react";
 import { useTheme } from "next-themes";
 import localFont from "next/font/local";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation"; // Import useRouter
 
 const customFont = localFont({
   src: "../public/fonts/AstroSpace-0Wl3o.otf",
@@ -45,6 +46,9 @@ const texts = ["Welcome", "To"];
 export default function Home() {
   const { isSignedIn } = useAuth();
   const [mounted, setMounted] = useState(false);
+  const [loading, setLoading] = useState(false); // Add loading state
+  const [buttonLoading, setButtonLoading] = useState(false); // Add button loading state
+  const router = useRouter(); // Initialize useRouter
 
   const theme = useTheme();
   const shadowColor = theme.resolvedTheme === "dark" ? "white" : "black";
@@ -53,9 +57,32 @@ export default function Home() {
     setMounted(true);
   }, []);
 
+  useEffect(() => {
+    const handleRouteChange = () => {
+      setLoading(true);
+    };
+
+    if (router?.events) {
+      router.events.on("routeChangeStart", handleRouteChange);
+      router.events.on("routeChangeComplete", () => setLoading(false));
+      router.events.on("routeChangeError", () => setLoading(false));
+
+      return () => {
+        router.events.off("routeChangeStart", handleRouteChange);
+        router.events.off("routeChangeComplete", () => setLoading(false));
+        router.events.off("routeChangeError", () => setLoading(false));
+      };
+    }
+  }, [router]);
+
   if (!mounted) {
     return <div className="min-h-screen"></div>;
   }
+
+  const handleButtonClick = () => {
+    setButtonLoading(true); 
+    
+  };
 
   return (
     <Box className="min-h-screen ">
@@ -166,9 +193,23 @@ export default function Home() {
 
           <motion.div whileHover={{ scale: 1.3 }} whileTap={{ scale: 1 }}>
             <Link href="/sign-up" passHref>
-              <RainbowButton className="mt-4">Get Started</RainbowButton>
+              <RainbowButton className="mt-4" onClick={handleButtonClick}>
+                Get Started
+              </RainbowButton>
             </Link>
           </motion.div>
+
+          {buttonLoading && (
+            <div className="flex justify-center mt-4">
+              <CircularProgress />
+            </div>
+          )}
+
+          {loading && (
+            <div className="flex justify-center mt-4">
+              <CircularProgress />
+            </div>
+          )}
         </div>
       </div>
     </Box>
