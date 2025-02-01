@@ -6,6 +6,7 @@ import './globals.css';
 import { usePathname } from 'next/navigation';
 import Navbar from './navbar/page';
 import "@coreui/coreui/dist/css/coreui.min.css";
+import { Analytics } from "@vercel/analytics/next";
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -20,7 +21,7 @@ export default function RootLayout({ children }) {
         <ClerkProvider navigate={(to) => router.push(to)}>
           {showNavbar && <Navbar />}
           <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 min-h-screen">
-            {children}
+            {children}<Analytics />
           </main>
         </ClerkProvider>
       </body>

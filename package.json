@@ -23,6 +23,7 @@
     "@mui/material": "^6.3.0",
     "@mui/x-charts": "^7.23.2",
     "@supabase/supabase-js": "^2.47.10",
+    "@vercel/analytics": "^1.4.1",
     "axios": "^1.7.9",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
